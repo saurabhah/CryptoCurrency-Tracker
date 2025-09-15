@@ -5,9 +5,9 @@ from fastapi import FastAPI,Depends,HTTPException
 from fastapi.security import OAuth2PasswordBearer,OAuth2PasswordRequestForm
 from dotenv import load_dotenv
 
-from app.db import engine,get_db,User
-from app.model import Token,UserCreate
-from app.login_token import get_password_hash,create_access_token,get_user,authenticate_user,get_current_user
+from backend.db import engine,get_db,User
+from backend.model import Token,UserCreate
+from backend.login_token import get_password_hash,create_access_token,get_user,authenticate_user,get_current_user
 
 from sqlalchemy.orm import Session
 from sqlalchemy.ext.declarative import declarative_base
