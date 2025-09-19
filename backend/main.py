@@ -12,12 +12,25 @@ from backend.login_token import get_password_hash,create_access_token,get_user,a
 from sqlalchemy.orm import Session
 from sqlalchemy.ext.declarative import declarative_base
 
+from fastapi.middleware.cors import CORSMiddleware
 
+app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",  # React dev server
+        "http://127.0.0.1:3000",
+        # Add more origins as needed
+        # "https://your-production-domain.com",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],  # or ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+    allow_headers=["*"],  # or specific headers like ["Content-Type", "Authorization"]
+)
 Base = declarative_base()
 load_dotenv()
 
 
-app = FastAPI()
 
 @app.get("/")
 async def root():
