@@ -1,40 +1,46 @@
 
 import './App.css';
 import { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { BrowserRouter, Routes, Route, Link, Outlet, Router } from 'react-router-dom';
 
 function LoginPage() {
-const [username , setUsername] = useState('');
+  const [username , setUsername] = useState('');
   const [password , setPassword] = useState('');
   const [FormData , setFormdata] = useState({username:'',password:''});
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState(null);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
+  const location = useLocation();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
           console.log('Login submitted:', {username, password });
-        
-    // Add your login logic here
-    const FormData = {username,password}
-    console.log(FormData);
+          const deashBoardUrl = location.state?.from?.pathname || "/dashboard";
+    
       try {
-            const response = await fetch('http://127.0.0.1:8000/login/', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify(FormData)
-            });
+            const response = await fetch('http://127.0.0.1:8000/login', {
+            method: 'POST',
+            headers:{'Content-Type': 'application/x-www-form-urlencoded'},
+            body: new URLSearchParams({
+                'username': username,
+                'password': password,
+            })
+        });
 
             if (!response.ok) {
               throw new Error(`HTTP error! status: ${response.status}`);
+               setFormdata({ email: '', password: '' }); // Reset form
+            }else{
+            const data = await response.json();
+            const accessToken = {key:data.access_token};
+            sessionStorage.setItem("accessToken", JSON.stringify(accessToken));
+            navigate(deashBoardUrl, { replace: true });
             }
 
-            const data = await response.json();
-            console.log(data)
-            setResponse(data);
-            setFormdata({ email: '', password: '' }); // Reset form
+
+           
           } catch (err) {
             setError(err.message);
           } finally {
@@ -52,7 +58,7 @@ const [username , setUsername] = useState('');
             </label>
             <input
               id="username"
-              type="email"
+              type="text"
               placeholder="Enter your email"
               onChange={(e) => setUsername(e.target.value)}
               className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"

@@ -1,6 +1,6 @@
 import os
 import requests
-
+import uvicorn
 from fastapi import FastAPI,Depends,HTTPException
 from fastapi.security import OAuth2PasswordBearer,OAuth2PasswordRequestForm
 from dotenv import load_dotenv
@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.ext.declarative import declarative_base
 
 from fastapi.middleware.cors import CORSMiddleware
+from typing import Annotated
 
 app = FastAPI()
 app.add_middleware(
@@ -79,7 +80,7 @@ def register(user: UserCreate, db : Session = Depends(get_db)):
 
 
 @app.post("/login",response_model=Token)
-def login(form_data :OAuth2PasswordRequestForm = Depends(),db:Session = Depends(get_db)):
+def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()],db:Session = Depends(get_db)):
     email = form_data.username
     user = authenticate_user(db,email,form_data.password)
     if not user:
@@ -92,3 +93,6 @@ def login(form_data :OAuth2PasswordRequestForm = Depends(),db:Session = Depends(
 async def read_users_me(current_user: User = Depends(get_current_user)):
     return {"email": current_user.email}
 
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
